@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: saleor-config
+  namespace: saleor
+data:
+  POSTGRES_USER: saleoradmin
+  POSTGRES_DB: saleordb
+  POSTGRES_HOST: saleordb.cxg0e8g0u1ud.us-east-1.rds.amazonaws.com
+  POSTGRES_PORT: "5432"
+  ALLOWED_HOSTS: qeedis.com,localhost,*,saleor.qeedis.com 

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mailpit
+  namespace: saleor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mailpit
+  template:
+    metadata:
+      labels:
+        app: mailpit
+    spec:
+      containers:
+      - name: mailpit
+        image: 047719631188.dkr.ecr.us-east-1.amazonaws.com/mailpit:latest
+        ports:
+        - containerPort: 8025
+---
+# 11. Mailpit Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mailpit
+  namespace: saleor
+spec:
+  selector:
+    app: mailpit
+  ports:
+    - protocol: TCP
+      port: 8025
+      targetPort: 8025
+  type: ClusterIP

@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: saleor-init
+  namespace: saleor
+spec:
+  template:
+    spec:
+      containers:
+        - name: saleor-init
+          image: 047719631188.dkr.ecr.us-east-1.amazonaws.com/saleor:3.20
+          command:
+            - bash
+            - -c
+            - |
+              python manage.py migrate --noinput && \
+              echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.filter(email='$SUPERUSER_EMAIL').exists() or User.objects.create_superuser('$SUPERUSER_EMAIL', '$SUPERUSER_PASSWORD')" | python manage.py shell
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: saleor-db-secret
+                  key: SECRET_KEY
+            - name: RSA_PRIVATE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: saleor-db-secret
+                  key: RSA_PRIVATE_KEY
+            - name: RSA_PUBLIC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: saleor-db-secret
+                  key: RSA_PUBLIC_KEY
+            - name: SUPERUSER_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: saleor-superuser-secret
+                  key: SUPERUSER_EMAIL
+            - name: SUPERUSER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: saleor-superuser-secret
+                  key: SUPERUSER_PASSWORD
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: saleor-db-secret
+                  key: DATABASE_URL
+      restartPolicy: OnFailure
